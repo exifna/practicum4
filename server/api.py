@@ -54,7 +54,8 @@ def connect_to_game():
     games[game_id].add_player(player)
     return jsonify({
         'success' : True,
-        'token'   : player.token
+        'token'   : player.token,
+        'creator' : games[game_id].players[0].nickname
     })
 
 
@@ -69,10 +70,19 @@ def get_player_event():
         return jsonify(success = False)
 
     game = games[game_id]
+    player = game.check_player(token)
+    if not player:
+        return jsonify(success = False)
+
     return jsonify(success = True,
                    text = game.get_event(token),
                    level = game.level,
-                   month = game.month)
+                   month = game.month,
+                   balance = player.balance,
+                   workshops = player.workshops,
+                   material  = player.material,
+                   flighters = player.flighters
+                   )
 
 
 

@@ -1,16 +1,20 @@
+import random
 import requests
+from pick import pick
+import os
 
 class GameSession:
-    def __init__(self):
-        self.nickname: str = str()
-        self.session = requests.session()
+    def __init__(self, nickname: str):
+        self.nickname: str = nickname or f'Player #{random.randint(0, 100)}'
 
-        self.baseUrl = 'http://localhost:12001'
+        self.session: requests.session = requests.session()
+        self.baseUrl: str = 'http://localhost:12001'
+        self.game_creator: str = ''
 
-    def create_game(self, nickname: str):
+    def create_game(self) -> str:
         url = self.baseUrl + '/create_game'
         data = {
-            'nick' : nickname
+            'nick' : self.nickname
         }
 
         response = self.session.post(url, json=data)
@@ -28,16 +32,16 @@ class GameSession:
         r = self.session.get(url)
         return r.json()
 
-    def start_game(self):
+    def start_game(self) -> bool:
         url = self.baseUrl + '/start_game'
 
         return self.session.get(url).json()['success']
 
-    def connect_to_game(self, nick: str, game_id: str) -> bool:
+    def connect_to_game(self, game_id: str) -> bool:
         url = self.baseUrl + '/invite'
 
         data = {
-            'nick' : nick,
+            'nick' : self.nickname,
             'game_id' : game_id
         }
 
@@ -54,6 +58,32 @@ class GameSession:
             'game_id' : game_id,
             'token'  : token
         }
-
+        self.game_creator = response_data['creator']
         return True
 
+
+def choose_action() -> int:
+
+    title = f'{banner}\nPlease choose your action'
+    options = ['Create a new game',
+               'Connect to an exist game']
+
+    option, index = pick(options, title, indicator='=>')
+    return index
+
+banner = """
+  ________                       
+ /  _____/_____    _____   ____  
+/   \\  ___\\__  \\  /     \\_/ __ \\ 
+\\    \\_\\  \\/ __ \\|  Y Y  \\  ___/ 
+ \______  (____  /__|_|  /\___  >
+        \\/     \\/      \\/     \\/    By Exifna...
+ """
+
+def print_banner():
+    clear()
+    print(banner)
+
+
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
