@@ -132,8 +132,7 @@ class Game:
         if price < min_material_price:
             return False
 
-        self.material_players.append({'player' : Player,
-                                      })
+        self.material_players.append({'player' : Player })
 
 
 
@@ -146,7 +145,7 @@ class Game:
         return None
 
     def run(self) -> None:
-        thread = Thread(
+        Thread(
             target=self._run
         ).start()
 

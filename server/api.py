@@ -1,3 +1,5 @@
+import time
+
 from flask import Flask, jsonify, request
 from typing import List, Dict
 from server.types import Game, Player
@@ -81,7 +83,9 @@ def get_player_event():
                    balance = player.balance,
                    workshops = player.workshops,
                    material  = player.material,
-                   flighters = player.flighters
+                   flighters = player.flighters,
+                   time =game.last_step_time,
+                   data = game.get_prices()
                    )
 
 

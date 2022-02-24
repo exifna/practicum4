@@ -2,11 +2,10 @@ import time
 
 from client.tools import GameSession
 
-session = GameSession()
+session = GameSession('Bot')
 
 
 session.connect_to_game(
-    nick= 'admin',
     game_id=input('game_id: ')
 )
 
