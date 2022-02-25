@@ -42,8 +42,14 @@ while True:
     data = session.get_event()
     success = data['success']
     if not success:
-        print(f'Ошибка (game server return: {data})')
+        exit(f'Ошибка (game server return: {data}) - скорее всего вы умерли')
         continue
+
+    if data['text'] == 'dead':
+        exit('You умерли')
+
+    if data['text'] == 'win':
+        exit('You выиграли')
 
     balance = data['balance']
     flighters = data['flighters']
@@ -54,17 +60,20 @@ while True:
     _time = data['time'] + 30 - time.time() - 0.5
     _data = data['data']
 
-    banner = banner + '\n\n' \
+    _banner = banner + '\n\n' \
                       f'> Твой баланс: {balance}\n' \
                       f'> Твоих истребителей : {flighters}\n' \
                       f'> Сырья у тебя: {material}\n' \
                       f'> Цехов: {workshops}\n' \
                       f'> Месяц: {month}\n' \
                       f'> Текущий уровень: {level}\n\n' \
-                      f'> Максимальная цена за истрибитель - {data.flighter_max}\n' \
-                      f'> Кол-во сырья для покупки: {data.material_count}\n' \
-                      f'> Кол-во истребителей для покупки: {data.flighter_demand}'
+                      f'> Максимальная цена за истрибитель - {_data["flighter_max"]}\n' \
+                      f'> Кол-во сырья для покупки: {_data["material_count"]}\n' \
+                      f'> Кол-во истребителей для покупки: {_data["flighter_demand"]}'
 
+
+    clear()
+    print(_banner)
 
     if data['text'] == 'go':
         try:
@@ -73,9 +82,9 @@ while True:
                   f': {"❌ " if balance < 2000 else ""}Введи 1 если хочешь создать новый истребитель (стоимость - 2.000, у тебя {balance})\n'
                   f': Введи 2 <цена> если хочешь продать самолет (курс смотри выше, самолетов у тебя: {flighters}, максимальную и минимальную цену на самолет смотри выше)\n'
                   f': {"❌ " if balance < 5000 else ""}Введи 3 если хочешь построить новых цех (заёмет 4 месяца, стоимость - 5.000)\n'
-                  f': Введи 4 <цена> если хочешь купить сырье (минимальная и максимальная цена - смотри выше)\n> ', timeout=_time)
+                  f': Введи 4 <цена> <кол-во> если хочешь купить сырье (минимальная и максимальная цена - смотри выше)\n> ', timeout=_time)
 
-            print(something)
+            session.step(something)
 
         except:
-            print(traceback.format_exc())
+            something = ''

@@ -61,6 +61,16 @@ class GameSession:
         self.game_creator = response_data['creator']
         return True
 
+    def step(self, string: str):
+
+        data = {
+            'step' : string
+        }
+
+        print(self.session.post(self.baseUrl + '/step', data).text)
+
+
+
 
 def choose_action() -> int:
 

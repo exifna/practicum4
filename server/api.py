@@ -76,6 +76,13 @@ def get_player_event():
     if not player:
         return jsonify(success = False)
 
+    if len(game.players) == 1:
+        return jsonify({'success' : True, 'text' : 'win'})
+
+
+    if not player.live:
+        return jsonify({'success' : True, 'text' : 'dead'})
+
     return jsonify(success = True,
                    text = game.get_event(token),
                    level = game.level,
@@ -85,9 +92,47 @@ def get_player_event():
                    material  = player.material,
                    flighters = player.flighters,
                    time =game.last_step_time,
-                   data = game.get_prices()
+                   data = game.get_prices().__dict__()
                    )
 
+@app.post('/step')
+def step():
+    global games
 
+    headers = request.headers
+    game_id = headers.get('Game-Id')
+    token = headers.get('Token')
+    if game_id not in games:
+        return jsonify(success = False)
+
+    game = games[game_id]
+    player = game.check_player(token)
+    if not player:
+        return jsonify(success = False)
+
+    data = request.get_json()
+    step = data['step']
+
+    if game.nowPlayer.token == token:
+        game.skip = True
+
+        if data == '1':
+            game.create_flighter(token)
+            return
+
+        if data.split()[0] == '2':
+            game.buy_flighter(game.check_player(token), data)
+            return
+
+        if data == '3':
+            return
+
+        if data.split()[0] == '4':
+            return
+
+
+        return {'success' : True}
+
+    return {'success' : False}
 
 app.run('0.0.0.0', 12001)
